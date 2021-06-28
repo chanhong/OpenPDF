@@ -1,33 +1,32 @@
 package com.lowagie.text.pdf;
 
-import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
+import com.lowagie.text.Font;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;
+
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class TabTest {
+public class FontSelectorTest {
     @Test
-    public void TabTest1() throws IOException {
+    public void testDefaultFont() throws IOException {
         Document document = new Document(PageSize.A4.rotate(), 10, 10, 10, 10);
-        Document.compress = false;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            PdfWriter.getInstance(document,
-                    stream);
-            document.open();
-            Chunk a = new Chunk("data\ttable");
-            document.add(a);
-        } catch (Exception de) {
-            de.printStackTrace();
-        }
+        PdfWriter.getInstance(document, stream);
+        document.open();
+
+        FontSelector selector = new FontSelector();
+        selector.addFont(new Font(Font.HELVETICA));
+        document.add(selector.process("ΧαίρετεGreek -"));
         document.close();
+
         PdfReader rd = new PdfReader(stream.toByteArray());
         PdfTextExtractor pdfTextExtractor = new PdfTextExtractor(rd);
-        Assertions.assertEquals(pdfTextExtractor.getTextFromPage(1), "data\ttable");
+        Assertions.assertEquals(pdfTextExtractor.getTextFromPage(1), "ΧαίρετεGreek -");
     }
 }
