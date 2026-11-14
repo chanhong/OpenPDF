@@ -28,8 +28,8 @@ Press ENTER to continue. Ctrl-C to stop.
 EOD
 read ignored
 
-# echo "#1. Setting release version: ${VERSION}"
-# mvn versions:set -DnewVersion="${VERSION}"
+echo "#1. Setting release version: ${VERSION}"
+mvn versions:set -DnewVersion="${VERSION}"
 
 echo "#2. Test build"
 mvn clean install
@@ -44,13 +44,13 @@ echo "#3. Commit changes and tag"
 git commit -a -m "Set version to ${VERSION}" && git tag "${VERSION}"
 
 echo "#4. Make a staging release"
-mvn clean deploy
+mvn clean deploy -Prelease
 RC=$?
 if [ $RC -eq 0 ]
 then
     cat << EOD
-        Staging Release seems to be created. Please review it at https://oss.sonatype.org/#stagingRepositories
-        if everything seems fine, hit ENTER. Else break this script with Ctrl-C.
+        Staging Release seems to be created. Please review it at https://central.sonatype.com/publishing
+        if everything seems fine, publish from there. Else break this script with Ctrl-C.
 EOD
     read pause
 else
@@ -59,8 +59,7 @@ else
     exit
 fi
 
-echo "#5. Deploy release."
-mvn nexus-staging:release
+echo "#5. Deploy release. is deprecated. Should be rewritten"
 
 echo "#6. Finishing."
 echo " - set next SNAPSHOT to $NEW_VERSION"
